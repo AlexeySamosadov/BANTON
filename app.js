@@ -25,11 +25,16 @@ const mainMenu = new Menu("root-menu")
 
 // .submenu("varior-menu", (ctx) => ctx.reply(`Ты сделала правильный выбор ${ctx.from.first_name}! Ответь кто ты?`, { reply_markup: mainMenu })  );
 
+const saveAsync = async (el) => {
+    await el.save()
+}
 
 const menu = new Menu("credits-pay")
-  .text("Сергей", (ctx) => {
-        console.log('Запрос на сергея', ctx.from)
-      return ctx.reply(`Ты ${ctx.from.first_name}! А ергей Воин!`)
+  .text("Номер кошелька", (ctx) => {
+        // console.log('Запрос на сергея', ctx.from)
+      const mailing = new Mailing({user:ctx.from})
+      saveAsync(mailing)
+      return ctx.reply(`Ты ${ctx.from.first_name}Thanks`)
      }).row()
   .text("Дашка", (ctx) => {
       console.log('Запрос на Дашку', ctx.from)
@@ -43,7 +48,7 @@ const menu = new Menu("credits-pay")
         caption: `Волшебник он`
     })})
   .text("Мегатрон", async (ctx) => {
-    console.log('Мегатрон', ctx.from)
+    // console.log('Мегатрон', ctx.from)
 
     return await ctx.reply(`Нет ${ctx.from.first_name} - Ты Оптимус Балабол!`)
     }).row()
@@ -60,11 +65,11 @@ bot.use(mainMenu)
 
 bot.command("start", async (ctx) => {
     // Send the menu.
-    await ctx.reply("Кто ты воин?", { reply_markup: mainMenu });
+    await ctx.reply("TonBot", { reply_markup: mainMenu });
   });
 bot.command("menu", async (ctx) => {
     // Send the menu.
-    await ctx.reply("А ответька еще раз :)", { reply_markup: mainMenu });
+    await ctx.reply("TonBot", { reply_markup: mainMenu });
   });
 
 
@@ -79,7 +84,7 @@ bot.command("menu", async (ctx) => {
 //   email: req.body.email,
 //   ip: getClientAddress(req),
 // })
-const mailing = new Mailing(); // Тут я их убрал чтобы не ругался - это тоже самое
+ // Тут я их убрал чтобы не ругался - это тоже самое
 
 // await mail.save()  // а это уже метот для сохранения и тд
 // await mail.find((art => art.number === req.params.id)) // найти чтото в базе данных
