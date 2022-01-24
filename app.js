@@ -6,6 +6,8 @@ const Mailing = require('./models/mailing')
 const mongoose = require('mongoose')
 const app = express()
 
+
+// Меню из библиотеки
 // const {MenuTemplate, MenuMiddleware} = require('grammy-inline-menu')
 // const menuTemplate = new MenuTemplate(ctx => `Hey ${ctx.from.first_name}!`)
 // menuTemplate.interact('I am excited!', 'a', {
@@ -17,9 +19,22 @@ const app = express()
 
 const bot = new Bot(process.env.TOKEN)
 const mainMenu = new Menu("root-menu")
+.text("Приянть участие", (ctx) => {
+   return ctx.reply(
+     `${ctx.from.first_name}
+      Для созания аккаунта укажите пожалуйста ваш TON кошелек
+      Сделайте перевод только с указанного вами кошелька (http://ton.sh/address/EQC37faknSAl9Uc1ccqcbA9jpBSXSIR9j8yncIDtHr41eUvc).
+
+      Также вы можете отправить TON вручную на этот адрес: 
+      EQC37faknSAl9Uc1ccqcbA9jpBSXSIR9j8yncIDtHr41eUvc   
+      
+      Минимальный объём транзакции 10 TON.
+      ВАЖНО! Для перевода используйте только личные кошельки из Tonkeeper или TON Wallet.
+      `, { reply_markup: menuSendTON }
+     )
+})
 // .text("Создать кошелек", (ctx) => ctx.reply(`Ты сделала правильный выбор ${ctx.from.first_name}!Номер кашелька?`, { reply_markup: mainMenu })).row()
-    .submenu("Создать кошелек", "credits-pay")
-.text("Баланс", (ctx) => ctx.reply(`Ты ${ctx.from.first_name}! Пока делается!`))
+    .submenu("Баланс", "credits-pay")
 // .text("Yfpfn", (ctx) => ctx.menu.nav()) // Добавляет меню - работает криво
 
 
@@ -29,11 +44,24 @@ const saveAsync = async (el) => {
     await el.save()
 }
 
+const menuSendTON = new Menu("send-ton")
+.text("Отправить TON", (ctx) => {
+   
+    return ctx.reply(`${ctx.from.first_name} Здесь надо сделать ссылку 
+     на телегам при нажатии на кнопку должен сразу переходить
+    ton://transfer/EQC37faknSAl9Uc1ccqcbA9jpBSXSIR9j8yncIDtHr41eUvc
+    `, { reply_markup: menuBack })
+}).row()
+
+const menuBack = new Menu("go-back")
+.back("Назат");
+
+
 const menu = new Menu("credits-pay")
   .text("Номер кошелька", (ctx) => {
         // console.log('Запрос на сергея', ctx.from)
       const mailing = new Mailing({user:ctx.from})
-      saveAsync(mailing)
+      // saveAsync(mailing)
       return ctx.reply(`Ты ${ctx.from.first_name}Thanks`)
      }).row()
   .text("Дашка", (ctx) => {
@@ -56,16 +84,27 @@ const menu = new Menu("credits-pay")
 //   .back("Назат");
 
 mainMenu.register(menu);
+mainMenu.register(menuSendTON);
+mainMenu.register(menuBack);
+
 // const menuMiddleware = new MenuMiddleware('/', menuTemplate)
 // bot.command('start', ctx => menuMiddleware.replyToContext(ctx))
 
-
-// bot.use(menu)
 bot.use(mainMenu)
-
 bot.command("start", async (ctx) => {
     // Send the menu.
-    await ctx.reply("TonBot", { reply_markup: mainMenu });
+    await ctx.reply(
+      `
+      Приветсвую в  TONBANKBOT  \n
+      TONBANK — отправляйте TON и получайте вознаграждения из дохода нашего валидатора. \n
+       Чтобы быстро добавить задачу, просто напишите ее и отправьте боту \n` + 
+       `Обратите внимание, что это не смарт-контракт номинаторов, вы отправляете TON на баланс нашего валидатора, они используются для подтверждения транзакций в блокчейне и за это начисляется доход. `,
+     { reply_markup: mainMenu });
+
+    // await ctx.replyWithHTML(
+    //     'Приветсвую в <b>TaskManagerBot</b>\n\n'+
+    //     'Чтобы быстро добавить задачу, просто напишите ее и отправьте боту',
+    //     { reply_markup: mainMenu })
   });
 bot.command("menu", async (ctx) => {
     // Send the menu.
