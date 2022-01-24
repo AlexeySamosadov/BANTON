@@ -47,14 +47,13 @@ const saveAsync = async (el) => {
 
 const menuSendTON = new Menu("send-ton")
 .text("Указать кошелек", (ctx) => {
-
-  const mailing = new Mailing({user:ctx.from})
+  const mailing = new Mailing({user:ctx})
       // saveAsync(mailing)
    
-  return ctx.reply(`${ctx.from.first_name} `, { reply_markup: menuBack })
+  return ctx.reply(`Укажите свой адресс кошелька TON ${ctx.from.first_name} `, { reply_markup: menuBack })
 })
 .text("Отправить TON", (ctx) => {
-   
+  
     return ctx.reply(`${ctx.from.first_name} Здесь надо сделать ссылку 
      на телегам при нажатии на кнопку должен сразу переходить
     ton://transfer/EQC37faknSAl9Uc1ccqcbA9jpBSXSIR9j8yncIDtHr41eUvc
@@ -122,6 +121,12 @@ bot.command("menu", async (ctx) => {
     await ctx.reply("TonBot", { reply_markup: mainMenu });
   });
 
+ 
+    bot.on("message", (ctx) => {
+    const message = ctx.message; // the message object
+    // console.log('Сообщение', message)
+  });
+ 
 
 
 
