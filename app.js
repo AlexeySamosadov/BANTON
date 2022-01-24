@@ -32,9 +32,9 @@ const mainMenu = new Menu("root-menu")
       ВАЖНО! Для перевода используйте только личные кошельки из Tonkeeper или TON Wallet.
       `, { reply_markup: menuSendTON }
      )
-})
+}).submenu("Баланс", "balance")
 // .text("Создать кошелек", (ctx) => ctx.reply(`Ты сделала правильный выбор ${ctx.from.first_name}!Номер кашелька?`, { reply_markup: mainMenu })).row()
-    .submenu("Баланс", "credits-pay")
+    
 // .text("Yfpfn", (ctx) => ctx.menu.nav()) // Добавляет меню - работает криво
 
 
@@ -44,7 +44,15 @@ const saveAsync = async (el) => {
     await el.save()
 }
 
+
 const menuSendTON = new Menu("send-ton")
+.text("Указать кошелек", (ctx) => {
+
+  const mailing = new Mailing({user:ctx.from})
+      // saveAsync(mailing)
+   
+  return ctx.reply(`${ctx.from.first_name} `, { reply_markup: menuBack })
+})
 .text("Отправить TON", (ctx) => {
    
     return ctx.reply(`${ctx.from.first_name} Здесь надо сделать ссылку 
@@ -52,38 +60,41 @@ const menuSendTON = new Menu("send-ton")
     ton://transfer/EQC37faknSAl9Uc1ccqcbA9jpBSXSIR9j8yncIDtHr41eUvc
     `, { reply_markup: menuBack })
 }).row()
+.back("Назат");
 
 const menuBack = new Menu("go-back")
 .back("Назат");
 
 
-const menu = new Menu("credits-pay")
-  .text("Номер кошелька", (ctx) => {
+const menuBalance = new Menu("balance")
+  .text("Мой баланс", (ctx) => {
         // console.log('Запрос на сергея', ctx.from)
-      const mailing = new Mailing({user:ctx.from})
-      // saveAsync(mailing)
-      return ctx.reply(`Ты ${ctx.from.first_name}Thanks`)
+      return ctx.replyWithPhoto(
+        'https://vplate.ru/images/article/orig/2020/01/splavy-zolota-vidy-sostav-i-cveta.jpg',
+        {
+          caption: `${ctx.from.first_name} ваш баланс`
+      }
+      )
      }).row()
-  .text("Дашка", (ctx) => {
-      console.log('Запрос на Дашку', ctx.from)
+  .text("Номер кошелька", (ctx) => {
+      console.log('Запрос на Баланс', ctx.from)
       return ctx.reply(`Ты ${ctx.from.first_name}! А Дашка таракашка!`)
     })
-  .text("Волшебник", (ctx) => {
-    console.log('Запрос на Волшебника', ctx.from)
+  .text("Вывод баланса", (ctx) => {
+    console.log('Запрос на вывод', ctx.from)
     return ctx.replyWithPhoto(
-    'http://risovach.ru/upload/2014/10/mem/tvoe-vyrazhenie-lica_62706348_orig_.jpeg',
+    'https://proprikol.ru/wp-content/uploads/2020/07/krasivye-kartinki-zoloto-58.jpg',
     {
-        caption: `Волшебник он`
-    })})
-  .text("Мегатрон", async (ctx) => {
+        caption: `Получайте`
+    })}).row()
+  .text("Потдержка", async (ctx) => {
     // console.log('Мегатрон', ctx.from)
 
     return await ctx.reply(`Нет ${ctx.from.first_name} - Ты Оптимус Балабол!`)
-    }).row()
-//   .text("Назат", async (ctx) => await ctx.menu.nav())
-//   .back("Назат");
+    })
+  .back("Назат").row();
 
-mainMenu.register(menu);
+mainMenu.register(menuBalance);
 mainMenu.register(menuSendTON);
 mainMenu.register(menuBack);
 
