@@ -66,7 +66,7 @@ bot.command("menu", async (ctx) => {
     await ctx.reply("А ответька еще раз :)", { reply_markup: mainMenu });
   });
 
-// Вот пример как с моделями работать 
+// Вот пример как с моделями работать  это все хранится в файле модели
 // const {Mailing} = require('/models/mailing') какаято хрень с импотрами все перенес сюда
 const {Schema, model} = require('mongoose')
 const mailingSchema = new Schema({
@@ -74,11 +74,23 @@ const mailingSchema = new Schema({
     email: String,
     ip: String,
 })
+
+
+
+// Как пользоваться моделями это лежит в контроллере
+// const mailing = new Mailing(title, price, img); Тут обязательные пропсы
 const Mailing = model('Mailing', mailingSchema)
+// const mail = new Mailing({
+//   messageDate: new Date(),     // это пример с пропсами
+//   email: req.body.email,
+//   ip: getClientAddress(req),
+// })
+const mailing = new Mailing(); // Тут я их убрал чтобы не ругался - это тоже самое
+
+// await mail.save()  // а это уже метот для сохранения и тд
+// await mail.find((art => art.number === req.params.id)) // найти чтото в базе данных
 
 
-// const mailing = new Mailing(title, price, img); ТУт обязательные пропсы
-const mailing = new Mailing(); // Тут я их убрал
 
 
 async function start() {
