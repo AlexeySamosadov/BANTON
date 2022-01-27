@@ -8,7 +8,8 @@ startStep.on('text', async (ctx) => {
         ctx.wizard.state.data.userName = ctx.message.from.username 
         ctx.wizard.state.data.firstName = ctx.message.from.first_name
         ctx.wizard.state.data.lastName = ctx.message.from.last_name       
-        await ctx.replyWithHTML("Какого <b>специалиста</b> вы ищите? \n <i>Например, например менеджер по продаже автомобилей</i>")
+        await ctx.replyWithHTML(`Ваш баланс <b>равен</b>   \n 
+        <i>Например, здесь будет описан ваш баланс</i>`)
     
         return ctx.wizard.next()
     } catch (e) {
@@ -16,6 +17,6 @@ startStep.on('text', async (ctx) => {
     }
 })
 
-const resumeScene = new Scenes.WizardScene('resumeWizard', startStep)
+const resumeScene = new Scenes.WizardScene('balanceWizard', startStep)
 
 module.exports = resumeScene

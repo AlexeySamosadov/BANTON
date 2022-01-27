@@ -1,7 +1,8 @@
 const { Markup, Composer, Scenes } = require('telegraf')
 const axios = require('axios')
 
-// Запросы на TON чтобы получить информацию по конкрентной транзаки
+// Запросы на TON чтобы получить информацию по конкрентной транзаки 
+// Работает
 const WALLET_ADDRESS = 'EQC37faknSAl9Uc1ccqcbA9jpBSXSIR9j8yncIDtHr41eUvc'
 const TRANSACTION_TIME = '24794687000001'
 const TRANSACTION_HASH = 'k3fg13W4L4tFG2/tjLHCWC6qXAJfnXwAb1W342X9XVY'
@@ -16,25 +17,30 @@ const TRANSACTION_HASH = 'k3fg13W4L4tFG2/tjLHCWC6qXAJfnXwAb1W342X9XVY'
 
 const getMainWalletTransactions = async () => {
   try {
-    // return await axios.get(`https://api.ton.sh/getTransactions?address=${WALLET_ADDRESS}&lt=${TRANSACTION_TIME}&hash=${TRANSACTION_HASH}=&limit=1`)
+    return await axios.get(`https://api.ton.sh/getTransactions?address=${WALLET_ADDRESS}&lt=${TRANSACTION_TIME}&hash=${TRANSACTION_HASH}=&limit=1`)
     // return await axios.get(`https://api.ton.sh/getTransactions?address=${WALLET_ADDRESS}`)
-    return await axios.get(`https://toncenter.com/api/v2/getTransactions?address=${WALLET_ADDRESS}`)
+    // return await axios.get(`https://toncenter.com/api/v2/getTransactions?address=${WALLET_ADDRESS}`)
 
   } catch (error) {
     console.error(error)
   }
 }
 const countTransactions = async () => {
-  const breeds = await getMainWalletTransactions()
-  console.log('breeds', breeds.data.result)
-  if (breeds.data.result) {
-    console.log(`Got ${Object.entries(breeds.data.result).length} transactions`)
+  console.log('sd')
+  const transactionsInfo = await getMainWalletTransactions()
+  if (transactionsInfo.data.result) {
+    console.log(`Got ${Object.entries(transactionsInfo.data.result).length} transactions`)
+
+    return transactionsInfo.data.result;
   }
+  
 }
 
 const startStep = new Composer()
 startStep.on('text', async (ctx) => {
-    countTransactions()
+   const transactions = await countTransactions()
+   console.log('transactions', transactions)
+
 
     
     try {

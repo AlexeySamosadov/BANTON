@@ -1,22 +1,23 @@
 const { Telegraf, Scenes, Markup, session} = require('telegraf')
 const registartionScene = require('./scenes/registartion.js')
-const resumeScene = require('./scenes/resume.js')
-const addBalunceScene = require('./scenes/advertisiment.js')
+const balance = require('./scenes/balance.js')
+const addBalanceScene = require('./scenes/addBalance.js')
 const Mailing = require('./models/mailing')
 const mongoose = require('mongoose')
 // const express = require('express')
 // const app = express()
 
+
 // const BOT_TOKEN_JOBSURE_BOT = '2057352717:AAGJ-OW4_utQOfSgg93l_U29Nzy6gamaWOg';
 TOKEN_TONBANK='5199205767:AAGBS3o_MKT2twHhtZjxN07XdkFWQIO3Fk4'
 const bot = new Telegraf(TOKEN_TONBANK)
 
-const stage = new Scenes.Stage([registartionScene, resumeScene, addBalunceScene])
+const stage = new Scenes.Stage([registartionScene, balance, addBalanceScene])
 bot.use(session())
 bot.use(stage.middleware())
 
 bot.hears('Принять участие', ctx => ctx.scene.enter('registrationSceneWizard'))
-bot.hears('Баланс', ctx => ctx.scene.enter('resumeWizard'))
+bot.hears('Баланс', ctx => ctx.scene.enter('balanceWizard'))
 bot.hears('Вывод баланса', ctx => ctx.scene.enter('addBalanceWizard'))
 bot.hears('Пополнить баланс', ctx => ctx.scene.enter('addBalanceWizard'))
 
@@ -47,7 +48,7 @@ async function start() {
                 return await ctx.reply(
                     `${ctx.from.first_name} Здраствуйте! Добро пожаловать в BANKTON:
                       Выберете пункты меню:`, Markup.keyboard([
-                        ['Пополнить Баланс', 'Вывод баланса'],
+                        ['Пополнить баланс', 'Вывод баланса'],
                         ['Баланс', 'Потдержка'],
 
                     ]
