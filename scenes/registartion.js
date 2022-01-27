@@ -82,7 +82,7 @@ titleStep.on('text', async (ctx) => {
             await ctx.replyWithHTML(`Вы успешно зарегистрированы <b>ваш кошелек </b> \n <i>${findedClient[0]?.wallet}</i>`,
                 
             )
-            return;
+            return ctx.wizard.next();
         } catch (e) {
         console.log(e)
         }
