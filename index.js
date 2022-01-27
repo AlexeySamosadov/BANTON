@@ -2,7 +2,7 @@ const { Telegraf, Scenes, Markup, session} = require('telegraf')
 const registartionScene = require('./scenes/registartion.js')
 const balance = require('./scenes/balance.js')
 const addBalanceScene = require('./scenes/addBalance.js')
-const Mailing = require('./models/mailing')
+const Clients = require('./models/clients.js')
 const mongoose = require('mongoose')
 // const express = require('express')
 // const app = express()
@@ -17,6 +17,7 @@ bot.use(session())
 bot.use(stage.middleware())
 
 bot.hears('Принять участие', ctx => ctx.scene.enter('registrationSceneWizard'))
+bot.hears('Зарегистрировать кошелек еще раз', ctx => ctx.scene.enter('registrationSceneWizard'))
 bot.hears('Баланс', ctx => ctx.scene.enter('balanceWizard'))
 bot.hears('Вывод баланса', ctx => ctx.scene.enter('addBalanceWizard'))
 bot.hears('Пополнить баланс', ctx => ctx.scene.enter('addBalanceWizard'))
@@ -39,16 +40,16 @@ async function start() {
             const messagerID = ctx.update?.message?.from?.id
             console.log('messagerID', messagerID); 
 
-            const findedPerson = await Mailing.find({
+            const findedClient = await Clients.find({
                 user:  ctx.update?.message?.chat
-              })
+            })
 
 
-            if(findedPerson[0]?.user?.id === messagerID && findedPerson[0]?.wallet) {
+            if(findedClient[0]?.user?.id === messagerID && findedClient[0]?.wallet) {
                 return await ctx.reply(
                     `${ctx.from.first_name} Здраствуйте! Добро пожаловать в BANKTON:
                       Выберете пункты меню:`, Markup.keyboard([
-                        ['Пополнить баланс', 'Вывод баланса'],
+                        ['Пополнить аланс', 'Вывод баланса'],
                         ['Баланс', 'Потдержка'],
 
                     ]
