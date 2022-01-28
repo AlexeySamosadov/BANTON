@@ -1,62 +1,106 @@
 const { Markup, Composer, Scenes } = require('telegraf')
 const axios = require('axios')
+const Clients = require('../models/clients')
+const KeyBoards = require('../buttons/buttons')
 
-// Запросы на TON чтобы получить информацию по конкрентной транзаки 
+// Запросы на TON чтобы получить информацию по конкрентной транзаки
 // Работает
 const WALLET_ADDRESS = 'EQC37faknSAl9Uc1ccqcbA9jpBSXSIR9j8yncIDtHr41eUvc'
 const TRANSACTION_TIME = '24794687000001'
 const TRANSACTION_HASH = 'k3fg13W4L4tFG2/tjLHCWC6qXAJfnXwAb1W342X9XVY'
-
 
 // Тестовые не работают:
 // const WALLET_ADDRESS = 'EQC-8zBcr2d12_9tlR04qPlPUJsYtJ7kFgDLjLidqL3S0HzL'
 // const TRANSACTION_TIME = '25000784000001'
 // const TRANSACTION_HASH = 'Wl7k4QNdTWkBzonDzuy4npu3/1q/ghr1IYjiYqdWEuk='
 
-
+const clientSaveTransaction = async (client, data) => {
+	client.confirmedTransactions.push(data.data)
+	client.balance = Number(client.balance) + Number(data.in_msg.value)
+	await client.save()
+}
 
 const getMainWalletTransactions = async () => {
-  try {
-    return await axios.get(`https://api.ton.sh/getTransactions?address=${WALLET_ADDRESS}&lt=${TRANSACTION_TIME}&hash=${TRANSACTION_HASH}=&limit=1`)
-    // return await axios.get(`https://api.ton.sh/getTransactions?address=${WALLET_ADDRESS}`)
-    // return await axios.get(`https://toncenter.com/api/v2/getTransactions?address=${WALLET_ADDRESS}`)
-
-  } catch (error) {
-    console.error(error)
-  }
+	try {
+		return await axios({
+			method: 'GET',
+			url: `https://toncenter.com/api/v2/getTransactions`,
+			params: {
+				address: WALLET_ADDRESS,
+				limit: 100,
+			},
+		})
+	} catch (error) {
+		console.error(error)
+	}
 }
 const countTransactions = async () => {
-  console.log('sd')
-  const transactionsInfo = await getMainWalletTransactions()
-  if (transactionsInfo.data.result) {
-    console.log(`Got ${Object.entries(transactionsInfo.data.result).length} transactions`)
-
-    return transactionsInfo.data.result;
-  }
-  
+	console.log('sd')
+	const transactionsInfo = await getMainWalletTransactions()
+	if (transactionsInfo.data.result) {
+		// console.log(`Got ${Object.entries(transactionsInfo.data.result).length} transactions`)
+		return transactionsInfo.data.result
+	}
 }
 
-const startStep = new Composer()
-startStep.on('text', async (ctx) => {
-   const transactions = await countTransactions()
-   console.log('transactions', transactions)
+const firstStep = new Composer()
 
+firstStep.on('text', async (ctx) => {
+	await ctx.replyWithHTML(`${ctx.from.first_name}
+		    Для созания аккаунта укажите пожалуйста ваш TON кошелек
+		    Сделайте перевод только с <b><a href="http://ton.sh/address/EQC37faknSAl9Uc1ccqcbA9jpBSXSIR9j8yncIDtHr41eUvc">указанного вами Кошелька</a></b>.
 
-    
-    try {
-        ctx.wizard.state.data = {}
-        ctx.wizard.state.data.userName = ctx.message.from.username 
-        ctx.wizard.state.data.firstName = ctx.message.from.first_name
-        ctx.wizard.state.data.lastName = ctx.message.from.last_name       
-        await ctx.replyWithHTML("Баланс <b>специалиста</b> вы ищите? \n <i>Например, например менеджер по продаже автомобилей</i>")
-    
-        return ctx.wizard.next()
-    } catch (e) {
-        console.log(e)
-    }
+		    Также вы можете отправить TON вручную на этот адрес:
+		    <i>EQC37faknSAl9Uc1ccqcbA9jpBSXSIR9j8yncIDtHr41eUvc</i>
+
+		    Минимальный объём транзакции <b>10 TON</b>.
+		    <i>ВАЖНО!</i> Для перевода используйте только личные кошельки из <b>Tonkeeper</> или <b>TON Wallet</>.
+		`)
+	await KeyBoards.confirmBalanceButton(ctx)
+	return ctx.wizard.next()
 })
 
+const secondStep = new Composer()
+secondStep.on('text', async (ctx) => {
+	try {
+		const transactions = await countTransactions()
+		const messagerID = String(ctx.update?.message?.from?.id)
+		let findedClient = await Clients.findOne({ 'user.telegramClientID': messagerID })
+		const transactionsData = transactions.filter((it) => it?.in_msg?.source === findedClient.wallet)
+		if (transactionsData && transactionsData.length === 1) {
+			findedClient.confirmedTransactions.push(transactionsData[0].data)
+			findedClient.balance = transactionsData[0].in_msg.value
+			await findedClient.save()
+			await ctx.reply('Вам успешно зачисленны')
+		} else {
+			const newData = transactionsData?.filter((it) => !findedClient.confirmedTransactions.some((el) => el === it.data))
+			if (newData && newData.length === 1) {
+				// findedClient.confirmedTransactions.push(newData[0].data)
+				// findedClient.balance = Number(findedClient.balance) + Number(newData[0].in_msg.value)
+				// await findedClient.save()
+				// await ctx.reply('Вам успешно зачисленны')
+				await clientSaveTransaction(findedClient, newData[0])
+				await ctx.reply('Вам успешно зачисленны')
+			} else if (newData && newData.length > 1) {
+				console.log('newData',newData)
+				newData.map(async (data) => {
+					findedClient = await Clients.findOne({ 'user.telegramClientID': messagerID })
+					findedClient.confirmedTransactions.push(data.data)
+					findedClient.balance = Number(findedClient.balance) + Number(data.in_msg.value)
+					await findedClient.save()
+				})
+				await ctx.reply(`Вам успешно зачисленны,  ваш баланс:  ${findedClient.balance}`)
+			} else {
+				await ctx.reply('У вас нет новых транзакций')
+				return ctx.scene.leave()
+			}
+		}
+		return ctx.scene.leave()
+	} catch (e) {
+		console.log(e)
+	}
+})
 
-const advertisimentScene = new Scenes.WizardScene('addBalanceWizard', startStep)
+const advertisimentScene = new Scenes.WizardScene('addBalanceWizard', firstStep, secondStep)
 
 module.exports = advertisimentScene
