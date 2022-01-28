@@ -65,7 +65,7 @@ secondStep.on('text', async (ctx) => {
 	try {
 		const transactions = await countTransactions()
 		const messagerID = String(ctx.update?.message?.from?.id)
-		let findedClient = await Clients.findOne({ 'user.telegramClientID': messagerID })
+		const findedClient = await Clients.findOne({ 'user.telegramClientID': messagerID })
 		const transactionsData = transactions.filter((it) => it?.in_msg?.source === findedClient.wallet)
 		if (transactionsData && transactionsData.length === 1) {
 			findedClient.confirmedTransactions.push(transactionsData[0].data)
@@ -82,13 +82,15 @@ secondStep.on('text', async (ctx) => {
 				await clientSaveTransaction(findedClient, newData[0])
 				await ctx.reply('Вам успешно зачисленны')
 			} else if (newData && newData.length > 1) {
-				console.log('newData',newData)
-				newData.map(async (data) => {
-					findedClient = await Clients.findOne({ 'user.telegramClientID': messagerID })
+				newData.map( (data) => {
 					findedClient.confirmedTransactions.push(data.data)
 					findedClient.balance = Number(findedClient.balance) + Number(data.in_msg.value)
-					await findedClient.save()
+					console.log('findedClient.balance',findedClient.balance)
+					console.log('data.in_msg.value',data.in_msg.value)
+
 				})
+				await findedClient.save()
+
 				await ctx.reply(`Вам успешно зачисленны,  ваш баланс:  ${findedClient.balance}`)
 			} else {
 				await ctx.reply('У вас нет новых транзакций')

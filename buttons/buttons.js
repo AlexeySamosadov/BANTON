@@ -16,7 +16,7 @@ class KeyBoards {
 
     static async confirmBalanceButton(ctx) {
         return await ctx.reply(
-            `${ctx.from.first_name} После перевода TON, нажмите кнопку "Подтвердить зачисление"`,
+            `${ctx.from.first_name} После перевода TON, нажмите кнопку "Подтвердить зачисление" для зачисления на ваш счет`,
             Markup.keyboard([
                 ['Подтвердить зачисление'],
             ])
