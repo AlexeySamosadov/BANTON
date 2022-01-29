@@ -63,10 +63,12 @@ firstStep.on('text', async (ctx) => {
 const secondStep = new Composer()
 secondStep.on('text', async (ctx) => {
 	try {
-		const transactions = await countTransactions()
+		const transactionsAll = await countTransactions()
 		const messagerID = String(ctx.update?.message?.from?.id)
 		const findedClient = await Clients.findOne({ 'user.telegramClientID': messagerID })
-		const transactionsData = transactions.filter((it) => it?.in_msg?.source === findedClient.wallet)
+		const transactionsData = transactionsAll.filter((it) => it?.in_msg?.source === findedClient.wallet)
+
+		// Проверка на колличество предыдущих транзакий
 		if (transactionsData && transactionsData.length === 1) {
 			const newData = transactionsData?.filter((it) => !findedClient.confirmedTransactions.some((el) => el === it.data))
 			if (newData && newData.length === 1) {

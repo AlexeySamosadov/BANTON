@@ -2,7 +2,7 @@ const express = require('express')
 require('dotenv').config()
 const { Bot } = require('grammy')
 const { Menu } = require("@grammyjs/menu");
-const Mailing = require('./models/mailing')
+const Mailing = require('./models/clients')
 const mongoose = require('mongoose')
 const app = express()
 

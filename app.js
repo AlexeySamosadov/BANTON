@@ -2,6 +2,7 @@ const { Telegraf, Scenes, Markup, session } = require('telegraf')
 const registartionScene = require('./scenes/registartion.js')
 const balance = require('./scenes/balance.js')
 const addBalanceScene = require('./scenes/addBalance.js')
+const indexBalanceScene = require('./scenes/indexBalance.js')
 const Clients = require('./models/clients.js')
 const mongoose = require('mongoose')
 const KeyBoards = require('./buttons/buttons')
@@ -12,7 +13,7 @@ const KeyBoards = require('./buttons/buttons')
 TOKEN_TONBANK = '5199205767:AAGBS3o_MKT2twHhtZjxN07XdkFWQIO3Fk4'
 const bot = new Telegraf(TOKEN_TONBANK)
 
-const stage = new Scenes.Stage([registartionScene, balance, addBalanceScene])
+const stage = new Scenes.Stage([registartionScene, balance, addBalanceScene, indexBalanceScene])
 bot.use(session())
 bot.use(stage.middleware())
 
@@ -21,6 +22,7 @@ bot.hears('Зарегистрировать кошелек еще раз', (ctx)
 bot.hears('Баланс', (ctx) => ctx.scene.enter('balanceWizard'))
 bot.hears('Вывод баланса', (ctx) => ctx.scene.enter('addBalanceWizard'))
 bot.hears('Пополнить баланс', (ctx) => ctx.scene.enter('addBalanceWizard'))
+bot.hears('Проиндексировать балансы', (ctx) => ctx.scene.enter('indexBalanceWizard'))
 
 async function start() {
 	try {
@@ -37,34 +39,19 @@ async function start() {
 			try {
 				const messagerID = String(ctx.update?.message?.from?.id)
 				const findedClient = await Clients.find({ 'user.telegramClientID': messagerID })
+				console.log(findedClient[0].isAdmin)
+				// Для задминистраторов
+				if (findedClient[0]?.isAdmin) {
+					return KeyBoards.startAdminButtons(ctx)
+			   }
 
+				// Для зарегистрированнях пользователей
 				if (findedClient[0]?.user?.telegramClientID === messagerID && findedClient[0]?.wallet) {
-					// return await ctx.reply(
-					// 	`${ctx.from.first_name} Здраствуйте! Добро пожаловать в BANKTON:
-					//   Выберете пункты меню:`,
-					// 	Markup.keyboard([
-					// 		['Пополнить баланс', 'Вывод баланса'],
-					// 		['Баланс', 'Потдержка'],
-					// 	])
-					// 		.oneTime()
-					// 		.resize()
-					// )
-					return KeyBoards.startButtons(ctx)
+				 	return KeyBoards.startRegiseredUserButtons(ctx)
 				}
 
-				await ctx.reply(
-					`Staking CAT — отправляйте TON и получайте вознаграждения из дохода нашего валидатора.
-
-            Мы реализовали альтернативу официального стейкинга уже сейчас, только для подписчиков закрытого канала ProTON.
-            
-            Обратите внимание, что это не смарт-контракт номинаторов, вы отправляете TON на баланс нашего валидатора, они используются для подтверждения транзакций в блокчейне и за это начисляется доход. Читать подробнее › (https://tonblockchain.ru/p/bd477170-c6f2-4327-80f2-4cefb6e83eba)`,
-					Markup.keyboard([
-						['Принять участие'],
-						// ['Баланс', 'Вывод баланса'],
-					])
-						.oneTime()
-						.resize()
-				)
+				// Для не зарегистрированнях пользователей
+				return KeyBoards.startButtons(ctx)
 			} catch (e) {
 				console.log(e)
 			}

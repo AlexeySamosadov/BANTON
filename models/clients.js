@@ -5,8 +5,9 @@ const clientsSchema = new Schema({
     registerDate: Number,
     wallet: String,
     confirmedTransactions: Array,
-    balance: Number
+    balance: Number,
+    investedBalance: Number,
+    isAdmin: Boolean
 })
-
 
 module.exports = model('Accounts', clientsSchema)
