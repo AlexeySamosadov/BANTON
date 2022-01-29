@@ -5,7 +5,7 @@ const Clients = require('./../models/clients.js')
 const startStep = new Composer()
 startStep.on('text', async (ctx) => {
 	try {
-		// Если нужно чтото жобавить и пробросить на следующий этап
+		// Если нужно чтото добавить и пробросить на следующий этап
 		ctx.wizard.state.data = {}
 		ctx.wizard.state.data.userName = ctx.message.from.username
 		ctx.wizard.state.data.firstName = ctx.message.from.first_name

@@ -68,10 +68,18 @@ secondStep.on('text', async (ctx) => {
 		const findedClient = await Clients.findOne({ 'user.telegramClientID': messagerID })
 		const transactionsData = transactions.filter((it) => it?.in_msg?.source === findedClient.wallet)
 		if (transactionsData && transactionsData.length === 1) {
-			findedClient.confirmedTransactions.push(transactionsData[0].data)
-			findedClient.balance = transactionsData[0].in_msg.value
-			await findedClient.save()
-			await ctx.reply('Вам успешно зачисленны')
+			const newData = transactionsData?.filter((it) => !findedClient.confirmedTransactions.some((el) => el === it.data))
+			if (newData && newData.length === 1) {
+				findedClient.confirmedTransactions.push(transactionsData[0].data)
+				findedClient.balance = transactionsData[0].in_msg.value
+				await findedClient.save()
+				await ctx.reply(`Вам успешно зачисленны ${Number(transactionsData[0].in_msg.value) / 1000000000 + " TON"}\n 
+					Ваш баланс:  ${findedClient.balance / 1000000000 + " TON1"}`)
+			} else {
+				await ctx.reply('У вас нет новых транзакций')
+				return ctx.scene.leave()
+			}
+			
 		} else {
 			const newData = transactionsData?.filter((it) => !findedClient.confirmedTransactions.some((el) => el === it.data))
 			if (newData && newData.length === 1) {
@@ -80,9 +88,12 @@ secondStep.on('text', async (ctx) => {
 				// await findedClient.save()
 				// await ctx.reply('Вам успешно зачисленны')
 				await clientSaveTransaction(findedClient, newData[0])
-				await ctx.reply('Вам успешно зачисленны')
+				await ctx.reply(`Вам успешно зачисленны ${Number(newData[0].in_msg.value)  / 1000000000 + " TON2"}\n 
+				Ваш баланс:  ${findedClient.balance / 1000000000 + " TON"}`)
 			} else if (newData && newData.length > 1) {
+				let addTObalance = 0
 				newData.map( (data) => {
+					addTObalance += Number(data.in_msg.value)
 					findedClient.confirmedTransactions.push(data.data)
 					findedClient.balance = Number(findedClient.balance) + Number(data.in_msg.value)
 					console.log('findedClient.balance',findedClient.balance)
@@ -91,7 +102,7 @@ secondStep.on('text', async (ctx) => {
 				})
 				await findedClient.save()
 
-				await ctx.reply(`Вам успешно зачисленны,  ваш баланс:  ${findedClient.balance}`)
+				await ctx.reply(`Вам успешно зачисленны ${Number(addTObalance) / 1000000000 + " TON3"},  ваш баланс:  ${findedClient.balance / 1000000000 + " TON"}`)
 			} else {
 				await ctx.reply('У вас нет новых транзакций')
 				return ctx.scene.leave()
