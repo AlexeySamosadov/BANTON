@@ -81,14 +81,10 @@ secondStep.on('text', async (ctx) => {
 				await ctx.reply('У вас нет новых транзакций')
 				return ctx.scene.leave()
 			}
-			
+
 		} else {
 			const newData = transactionsData?.filter((it) => !findedClient.confirmedTransactions.some((el) => el === it.data))
 			if (newData && newData.length === 1) {
-				// findedClient.confirmedTransactions.push(newData[0].data)
-				// findedClient.balance = Number(findedClient.balance) + Number(newData[0].in_msg.value)
-				// await findedClient.save()
-				// await ctx.reply('Вам успешно зачисленны')
 				await clientSaveTransaction(findedClient, newData[0])
 				await ctx.reply(`Вам успешно зачисленны ${Number(newData[0].in_msg.value)  / 1000000000 + " TON2"}\n 
 				Ваш баланс:  ${findedClient.balance / 1000000000 + " TON"}`)
@@ -98,9 +94,6 @@ secondStep.on('text', async (ctx) => {
 					addTObalance += Number(data.in_msg.value)
 					findedClient.confirmedTransactions.push(data.data)
 					findedClient.balance = Number(findedClient.balance) + Number(data.in_msg.value)
-					console.log('findedClient.balance',findedClient.balance)
-					console.log('data.in_msg.value',data.in_msg.value)
-
 				})
 				await findedClient.save()
 

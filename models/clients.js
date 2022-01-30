@@ -6,6 +6,7 @@ const clientsSchema = new Schema({
     wallet: String,
     confirmedTransactions: Array,
     balance: Number,
+    balanceWithPercent: Number,
     investedBalance: Number,
     isAdmin: Boolean
 })

@@ -6,13 +6,18 @@ startStep.on('text', async (ctx) => {
 	try {
 		const messagerID = String(ctx.update?.message?.from?.id)
 		const findedClient = await Clients.findOne({"user.telegramClientID": messagerID})
-
+		const differentBalance = findedClient.balanceWithPercent ? findedClient.balanceWithPercent-findedClient.balance : 0
 		ctx.wizard.state.data = {}
 		ctx.wizard.state.data.userName = ctx.message.from.username
 		ctx.wizard.state.data.firstName = ctx.message.from.first_name
 		ctx.wizard.state.data.lastName = ctx.message.from.last_name
-		await ctx.replyWithHTML(`Ваш баланс <b>равен</b>   \n 
-        <i>${findedClient.balance / 1000000000 + " TON"}</i>`)
+		await ctx.replyWithHTML(`Ваш баланс <b>равен</b>:
+        <i>${findedClient.balance / 1000000000 + " TON"}</i>
+		Ваш доход <b>равен</b>:
+        <i>${ differentBalance/ 1000000000 + " TON"}</i>`)
+
+
+
 
 		return ctx.scene.leave()
 	} catch (e) {
