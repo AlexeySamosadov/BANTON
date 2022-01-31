@@ -6,6 +6,7 @@ const indexBalanceScene = require('./scenes/indexBalance.js')
 const Clients = require('./models/clients.js')
 const mongoose = require('mongoose')
 const KeyBoards = require('./buttons/buttons')
+const store = require('store')
 // const express = require('express')
 // const app = express()
 
@@ -16,6 +17,7 @@ const bot = new Telegraf(TOKEN_TONBANK)
 const stage = new Scenes.Stage([registartionScene, balance, addBalanceScene, indexBalanceScene])
 bot.use(session())
 bot.use(stage.middleware())
+
 
 bot.hears('Принять участие', (ctx) => ctx.scene.enter('registrationSceneWizard'))
 bot.hears('Зарегистрировать кошелек еще раз', (ctx) => ctx.scene.enter('registrationSceneWizard'))
@@ -36,6 +38,8 @@ async function start() {
 
 		//   app.listen(PORT, () => console.log(`My server is running on port ${PORT}`))
 		bot.start(async (ctx) => {
+			const rferalID = ctx?.startPayload
+			store.set('rferalID', rferalID)
 			try {
 				const messagerID = String(ctx.update?.message?.from?.id)
 				const findedClient = await Clients.find({ 'user.telegramClientID': messagerID })

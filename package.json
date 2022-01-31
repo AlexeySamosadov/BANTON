@@ -20,6 +20,7 @@
     "grammy-inline-menu": "^7.0.2",
     "mongoose": "^6.1.7",
     "nodemon": "^2.0.15",
+    "store": "^2.0.12",
     "telegraf": "^4.6.0",
     "telegraf-markup4": "^1.0.2"
   }

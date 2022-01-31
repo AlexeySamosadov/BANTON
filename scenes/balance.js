@@ -1,8 +1,12 @@
 const { Markup, Composer, Scenes } = require('telegraf')
 const Clients = require('../models/clients')
+const store = require('store')
+
 
 const startStep = new Composer()
 startStep.on('text', async (ctx) => {
+ 	const refID = store.get('rferalID')
+	console.log('refID', refID)
 	try {
 		const messagerID = String(ctx.update?.message?.from?.id)
 		const findedClient = await Clients.findOne({"user.telegramClientID": messagerID})
