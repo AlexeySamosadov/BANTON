@@ -16,19 +16,19 @@ const secondStep = new Composer()
 secondStep.on('text', async (ctx) => {
 	try {
 		const messagerID = String(ctx.update?.message?.from?.id)
-		const findedClient = await Clients.find({ 'user.telegramClientID': messagerID })
-		if(findedClient.isAdmin) {
+		const findedClient = await Clients.findOne({ 'user.telegramClientID': messagerID })
+		if (findedClient.isAdmin) {
 			const allClients = await Clients.find()
-			allClients.map((async (client)=>{
-				if(client.balanceWithPercent && ctx?.message?.text) {
-					const str = ctx.message.text.replace(/,/gi,".")
+			allClients.map(async (client) => {
+				if (client.balanceWithPercent && ctx?.message?.text) {
+					const str = ctx.message.text.replace(/,/gi, '.')
 					const percent = (client.balanceWithPercent / 100) * Number(str)
 					client.balanceWithPercent = client.balanceWithPercent + percent
 				} else {
 					client.balanceWithPercent = client.balance
 				}
 				await client.save()
-			}))
+			})
 			// Проверка на колличество предыдущих транзакий
 
 			await KeyBoards.startAdminButtons(ctx)

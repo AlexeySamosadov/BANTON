@@ -8,7 +8,8 @@ const clientsSchema = new Schema({
     balance: Number,
     balanceWithPercent: Number,
     investedBalance: Number,
-    isAdmin: Boolean
+    isAdmin: Boolean,
+    withdraw: Boolean
 })
 
 module.exports = model('Accounts', clientsSchema)
