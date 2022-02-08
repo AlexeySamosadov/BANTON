@@ -9,7 +9,8 @@ const clientsSchema = new Schema({
     balanceWithPercent: Number,
     investedBalance: Number,
     isAdmin: Boolean,
-    withdraw: Boolean
+    withdraw: Boolean,
+    userFather: Object
 })
 
 module.exports = model('Accounts', clientsSchema)

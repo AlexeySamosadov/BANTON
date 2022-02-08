@@ -14,13 +14,13 @@ startStep.on('text', async (ctx) => {
 		])
 			.oneTime()
 			.resize()
-		
+		const messagerId = ctx.update?.message?.from?.id;
 		await ctx.replyWithHTML(
-			  `${messengerName}, у нас действует реферальная система.
-			  Cкопируйте ссылку, пришлите друзьям и при
-			  зачислении средств за стейкинг, вы получите 5% от вложенных средств
-		      друга
-			   Ваша персональная ссылка: <i>https://t.me/BankTonbot="</i>`, 
+			  `<b>${messengerName}</b>, у нас действует реферальная система.
+			  Cкопируйте ссылку, пришлите друзьям 
+			  и при зачислении средств за стейкинг, вы получите 5% 
+			  от дохода со средств вашего друга
+			  Ваша персональная ссылка: <i>https://t.me/BankTonbot?start=${messagerId}</i>`, 
 			  Keyboard
 		)
 

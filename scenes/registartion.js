@@ -1,6 +1,7 @@
 const { Markup, Composer, Scenes } = require('telegraf')
 const KeyBoards = require('../buttons/buttons')
 const Clients = require('../models/clients.js')
+const store = require('store')
 
 const startStep = new Composer()
 startStep.on('text', async (ctx) => {
@@ -45,6 +46,7 @@ titleStep.on('text', async (ctx) => {
 				)
 				return
 			}
+			const userFather = store.get('userFather')
 
 			const client = await new Clients({
 				user: ctx.wizard.state.data,
@@ -52,8 +54,8 @@ titleStep.on('text', async (ctx) => {
 				wallet: ctx.update.message.text,
 				confirmedTransactions: [],
 				balance: 0,
+				userFather,
 			})
-			console.log('client', client)
 			await client.save()
 
 			const findedClient = await Clients.find({
