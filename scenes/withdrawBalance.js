@@ -64,6 +64,16 @@ const thirdStep = new Composer()
 
 thirdStep.on('text', async (ctx) => {
 	if (ctx.message.text === BUTTONS.confirmBalance) {
+		const messagerID = String(ctx.update?.message?.from?.id)
+		const findedClient = await Clients.findOne({ 'user.telegramClientID': messagerID })
+
+		if(!findedClient.balance) {
+			await ctx.replyWithHTML(
+				`Недостаточно средств для вывода 
+				<strong>Баланс равен: 0 TON</strong>`
+			)
+			return ctx.scene.leave()
+		}
 		await ctx.replyWithHTML(
 			`Чтобы вывести весь вклад, напишите в личные сообщения @AlexeySamosadov,
 				<strong> Внимание! комиссия за вывод средств составляет 10%</strong>`

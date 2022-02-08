@@ -37,9 +37,10 @@ const getMainWalletTransactions = async () => {
 const countTransactions = async () => {
 	console.log('sd')
 	const transactionsInfo = await getMainWalletTransactions()
-	if (transactionsInfo.data.result) {
+	console.log('------->transactionsInfo<---------',transactionsInfo?.length);
+	if (transactionsInfo?.data?.result) {
 		// console.log(`Got ${Object.entries(transactionsInfo.data.result).length} transactions`)
-		return transactionsInfo.data.result
+		return transactionsInfo?.data?.result
 	}
 }
 
@@ -52,7 +53,7 @@ firstStep.on('text', async (ctx) => {
 	 `cделайте перевод только с <b><a href="http://ton.sh/address/${findedClient?.wallet}">указанного вами Кошелька</a></b>.
 
 		    Также вы можете отправить TON вручную на этот адрес:
-		    <i>EQC37faknSAl9Uc1ccqcbA9jpBSXSIR9j8yncIDtHr41eUvc</i>
+		    <a href="ton://transfer/EQC37faknSAl9Uc1ccqcbA9jpBSXSIR9j8yncIDtHr41eUvc"><i>EQC37faknSAl9Uc1ccqcbA9jpBSXSIR9j8yncIDtHr41eUvc</i></a>
 
 		    Минимальный объём транзакции <b>1 TON</b>.
 		    <i>ВАЖНО!</i> Для перевода используйте только личные кошельки из <b>Tonkeeper</> или <b>TON Wallet</>.
@@ -73,7 +74,7 @@ secondStep.on('text', async (ctx) => {
 		const transactionsAll = await countTransactions()
 		const messagerID = String(ctx.update?.message?.from?.id)
 		const findedClient = await Clients.findOne({ 'user.telegramClientID': messagerID })
-		const transactionsData = transactionsAll.filter((it) => it?.in_msg?.source === findedClient.wallet)
+		const transactionsData = transactionsAll?.filter((it) => it?.in_msg?.source === findedClient.wallet)
 
 		// Проверка на колличество предыдущих транзакий
 		if (transactionsData && transactionsData.length === 1) {
