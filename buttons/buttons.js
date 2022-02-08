@@ -1,16 +1,13 @@
 const { Markup} = require('telegraf')
+const { Keyboard } = require('telegram-keyboard')
 
 class KeyBoards {
     static async startButtons(ctx) {
-        return await ctx.reply(
-            `Staking CAT — отправляйте TON и получайте вознаграждения из дохода нашего валидатора.
-
-    Мы реализовали альтернативу официального стейкинга уже сейчас, только для подписчиков закрытого канала ProTON.
-    
-    Обратите внимание, что это не смарт-контракт номинаторов, вы отправляете TON на баланс нашего валидатора, они используются для подтверждения транзакций в блокчейне и за это начисляется доход. Читать подробнее › (https://tonblockchain.ru/p/bd477170-c6f2-4327-80f2-4cefb6e83eba)`,
+        return await ctx.replyWithHTML(
+            `  <b>TonBank</b>- отправляете криптовалюту TON и получаете проценты от валидатора. \n` +  '\n' +
+            '  <i>Официальный стейкинг, только для наших подписчиков.</i>',
             Markup.keyboard([
                 ['Принять участие'],
-                // ['Баланс', 'Вывод баланса'],
             ])
                 .oneTime()
                 .resize()
@@ -19,16 +16,34 @@ class KeyBoards {
 
 
     static async startRegiseredUserButtons(ctx) {
-        return await ctx.reply(
-            `${ctx.from.first_name} Здраствуйте! Добро пожаловать в BANKTON:
-                      Выберете пункты меню:`,
+        const keyboard = Keyboard.make([
+            ['Пополнить баланс', 'Вывод средств'], // First row
+            ['Баланс', 'Потдержка'], // Second row
+          ])
+
+
+        return await ctx.replyWithHTML(
+            `<b><i>${ctx.from.first_name}</i></b>, Здраствуйте!` +
+             '\n Добро пожаловать в <b>TONBANK</b>: \n Выберете пункты меню:',
+             keyboard.reply())
+        //     Markup.keyboard([
+        //         ['Пополнить баланс', 'Вывод средств'],
+        //         ['Баланс', 'Потдержка'],
+        //     ])
+        //         .oneTime()
+        //         .resize()
+        // )
+    }
+
+    static  startRegUserButtons() {
+        return  
             Markup.keyboard([
                 ['Пополнить баланс', 'Вывод средств'],
                 ['Баланс', 'Потдержка'],
             ])
                 .oneTime()
                 .resize()
-        )
+        
     }
 
     static async startAdminButtons(ctx) {

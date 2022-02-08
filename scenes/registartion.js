@@ -12,8 +12,9 @@ startStep.on('text', async (ctx) => {
 		ctx.wizard.state.data.lastName = ctx.message.from.last_name
 		ctx.wizard.state.data.telegramClientID = String(ctx.message.from.id)
 
-		await ctx.reply(
-			'Укажите ваш кошелек пожалуйста'
+		await ctx.replyWithHTML(
+			'Укажите ваш кошелек пожалуйста из <b>TONKeper</b> или <b>TonWallet</b>.' 
+			+ '\n Например: <i>EQC37faknSAl9Uc1ccqcbA9jpBSXSIR9j8yncIDtHr41eUvc</i>' 
 			// Markup.markdown().urlButton('Отправить средсва', 'http://ton.sh/address/EQC37faknSAl9Uc1ccqcbA9jpBSXSIR9j8yncIDtHr41eUvc')
 			//  Markup.keyboard([
 			//     ['Принять участие'],
@@ -60,7 +61,7 @@ titleStep.on('text', async (ctx) => {
 				registerDate: ctx.update.message.date,
 			})
 			await ctx.replyWithHTML(`Вы успешно зарегистрированы <b>ваш кошелек </b> \n <i>${findedClient[0]?.wallet}</i>`)
-			await KeyBoards.startButtons(ctx)
+			await KeyBoards.startRegiseredUserButtons(ctx)
 			return ctx.scene.leave()
 		} catch (e) {
 			console.log(e)

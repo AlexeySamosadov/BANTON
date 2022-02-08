@@ -46,14 +46,16 @@ const countTransactions = async () => {
 const firstStep = new Composer()
 
 firstStep.on('text', async (ctx) => {
+	const messagerID = String(ctx.update?.message?.from?.id)
+	const findedClient = await Clients.findOne({ 'user.telegramClientID': messagerID })
 	await ctx.replyWithHTML(`${ctx.from.first_name}
 		    Для созания аккаунта укажите пожалуйста ваш TON кошелек
-		    Сделайте перевод только с <b><a href="http://ton.sh/address/EQC37faknSAl9Uc1ccqcbA9jpBSXSIR9j8yncIDtHr41eUvc">указанного вами Кошелька</a></b>.
+		    Сделайте перевод только с <b><a href="http://ton.sh/address/${findedClient?.wallet}">указанного вами Кошелька</a></b>.
 
 		    Также вы можете отправить TON вручную на этот адрес:
 		    <i>EQC37faknSAl9Uc1ccqcbA9jpBSXSIR9j8yncIDtHr41eUvc</i>
 
-		    Минимальный объём транзакции <b>10 TON</b>.
+		    Минимальный объём транзакции <b>1 TON</b>.
 		    <i>ВАЖНО!</i> Для перевода используйте только личные кошельки из <b>Tonkeeper</> или <b>TON Wallet</>.
 		`)
 	await KeyBoards.confirmBalanceButton(ctx)
@@ -63,6 +65,12 @@ firstStep.on('text', async (ctx) => {
 const secondStep = new Composer()
 secondStep.on('text', async (ctx) => {
 	try {
+		const Keyboard = Markup.keyboard([
+			['Пополнить баланс', 'Вывод средств'],
+			['Баланс', 'Потдержка'],
+		])
+			.oneTime()
+			.resize()
 		const transactionsAll = await countTransactions()
 		const messagerID = String(ctx.update?.message?.from?.id)
 		const findedClient = await Clients.findOne({ 'user.telegramClientID': messagerID })
@@ -76,17 +84,17 @@ secondStep.on('text', async (ctx) => {
 				findedClient.balance = transactionsData[0].in_msg.value
 				await findedClient.save()
 				await ctx.reply(`Вам успешно зачисленны ${Number(transactionsData[0].in_msg.value) / 1000000000 + ' TON'}\n 
-					Ваш баланс:  ${findedClient.balance / 1000000000 + ' TON1'}`)
+					Ваш баланс:  ${findedClient.balance / 1000000000 + ' TON'}`, Keyboard)
 			} else {
-				await ctx.reply('У вас нет новых транзакций')
+				await ctx.reply('У вас нет новых транзакций', Keyboard)
 				return ctx.scene.leave()
 			}
 		} else {
 			const newData = transactionsData?.filter((it) => !findedClient.confirmedTransactions.some((el) => el === it.data))
 			if (newData && newData.length === 1) {
 				await clientSaveTransaction(findedClient, newData[0])
-				await ctx.reply(`Вам успешно зачисленны ${Number(newData[0].in_msg.value) / 1000000000 + ' TON2'}\n 
-				Ваш баланс:  ${findedClient.balance / 1000000000 + ' TON'}`)
+				await ctx.reply(`Вам успешно зачисленны ${Number(newData[0].in_msg.value) / 1000000000 + ' TON'}\n 
+				Ваш баланс:  ${findedClient.balance / 1000000000 + ' TON'}`, Keyboard)
 			} else if (newData && newData.length > 1) {
 				let addTObalance = 0
 				newData.map((data) => {
@@ -97,12 +105,12 @@ secondStep.on('text', async (ctx) => {
 				await findedClient.save()
 
 				await ctx.reply(
-					`Вам успешно зачисленны ${Number(addTObalance) / 1000000000 + ' TON3'},  ваш баланс:  ${
+					`Вам успешно зачисленны ${Number(addTObalance) / 1000000000 + ' TON'},  ваш баланс:  ${
 						findedClient.balance / 1000000000 + ' TON'
-					}`
+					}`, Keyboard
 				)
 			} else {
-				await ctx.reply('У вас нет новых транзакций')
+				await ctx.reply('У вас нет новых транзакций', Keyboard)
 				return ctx.scene.leave()
 			}
 		}

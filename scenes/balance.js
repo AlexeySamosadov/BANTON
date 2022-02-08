@@ -1,6 +1,7 @@
 const { Markup, Composer, Scenes } = require('telegraf')
 const Clients = require('../models/clients')
 const store = require('store')
+const KeyBoards = require('../buttons/buttons')
 
 const startStep = new Composer()
 startStep.on('text', async (ctx) => {
@@ -18,12 +19,18 @@ startStep.on('text', async (ctx) => {
 		ctx.wizard.state.data.firstName = ctx.message.from.first_name
 		ctx.wizard.state.data.lastName = ctx.message.from.last_name
 		await ctx.replyWithHTML(
-			`На вашем <b>счёте</b>: 
-		<i>${findedClient.balanceWithPercent / 1000000000 + ' TON'}</i>
-		Ваш вклад равен <b>равен</b>:
+			findedClient.balanceWithPercent ?  `На вашем <b>счёте</b>:
+			<i> ${findedClient.balanceWithPercent  / 1000000000 +  TON}'</i>
+			` : ``  + 
+		` Ваш вклад равен <b>равен</b>:
 		 <i>${findedClient.balance / 1000000000 + ' TON'}</i>
 		Доступно для <b>вывода</b>(в разделе вывод средств):
-		 <i>${differentBalance / 1000000000 + ' TON'}</i>`
+		 <i>${differentBalance / 1000000000 + ' TON'}</i>`, Markup.keyboard([
+			['Пополнить баланс', 'Вывод средств'],
+			['Баланс', 'Потдержка'],
+		])
+			.oneTime()
+			.resize()
 		)
 
 		return ctx.scene.leave()

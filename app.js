@@ -40,6 +40,7 @@ async function start() {
 			}
 		})
 
+
 		bot.launch()
 	} catch (e) {
 		console.log(e)

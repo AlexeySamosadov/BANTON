@@ -2,6 +2,7 @@ const { Markup, Composer, Scenes } = require('telegraf')
 const Clients = require('../models/clients')
 const store = require('store')
 const { BUTTONS } = require('../utils/utils')
+const KeyBoards = require('../buttons/buttons')
 
 const startStep = new Composer()
 startStep.on('text', async (ctx) => {
@@ -13,11 +14,12 @@ startStep.on('text', async (ctx) => {
 			: 0
 
 		await ctx.replyWithHTML(
-			`На вашем <b>счёте</b>: 
-		<i>${findedClient.balanceWithPercent / 1000000000 + ' TON'}</i>
-		Ваш вклад равен <b>равен</b>:
+			findedClient.balanceWithPercent ?  `На вашем <b>счёте</b>:
+			<i> ${findedClient.balanceWithPercent  / 1000000000 +  TON}'</i>
+			` : ``  + 
+		` Ваш вклад равен <b>равен</b>:
 		 <i>${findedClient.balance / 1000000000 + ' TON'}</i>
-		Доступно для <b>вывода</b>(проценты):
+		Доступно для <b>вывода</b>(в разделе вывод средств):
 		 <i>${differentBalance / 1000000000 + ' TON'}</i>`,
 			Markup.keyboard([[BUTTONS.percent, BUTTONS.stake],[BUTTONS.cancel]])
 				.oneTime()
@@ -33,6 +35,7 @@ const secondStep = new Composer()
 
 secondStep.on('text', async (ctx) => {
 	if((ctx.message.text === BUTTONS.cancel)) {
+		 await KeyBoards.startRegiseredUserButtons(ctx);
 		return ctx.scene.leave()
 	}
 	if (ctx.message.text === BUTTONS.percent) {
