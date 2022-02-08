@@ -23,6 +23,7 @@ async function start() {
 			try {
 				const messagerID = String(ctx.update?.message?.from?.id)
 				const findedClient = await Clients.find({ 'user.telegramClientID': messagerID })
+				
 				// Для задминистраторов
 				if (findedClient[0]?.isAdmin) {
 					return KeyBoards.startAdminButtons(ctx)

@@ -65,27 +65,27 @@ const thirdStep = new Composer()
 thirdStep.on('text', async (ctx) => {
 	if (ctx.message.text === BUTTONS.confirmBalance) {
 		await ctx.replyWithHTML(
-			`Чтобы вывести весь ваш вклад, напишите @AlexeySamosadov,
-				<strong> и не забываем вывод стредств составляет 10%</strong>`
+			`Чтобы вывести весь вклад, напишите в личные сообщения @AlexeySamosadov,
+				<strong> Внимание! комиссия за вывод средств составляет 10%</strong>`
 		)
 	}
 	if (ctx.message.text === BUTTONS.confirmPercent) {
 		const messagerID = String(ctx.update?.message?.from?.id)
 		const findedClient = await Clients.findOne({ 'user.telegramClientID': messagerID })
-		if(findedClient.balanceWithPercent === 0) {
+		if(!findedClient.balanceWithPercent || findedClient.balanceWithPercent === 0) {
 			await ctx.replyWithHTML(
-				`Ваша хотеть выводить - НЕЛЬЗЯ!, 
-				<strong>Баланс процентов равен: ${findedClient.balanceWithPercent}</strong>`
+				`Недостаточно средств для вывода 
+				<strong>Баланс процентов равен: ${findedClient.balanceWithPercent ? findedClient.balanceWithPercent : 0 }</strong>`
 			)
 			return ctx.scene.leave()
 		}
 		findedClient.withdraw = true
 		await findedClient.save()
-		await ctx.telegram.sendMessage(192816064,"Все работать хорошо, тебе приходить рассылка постоянно")
+		await ctx.telegram.sendMessage(192816064,"Появилась заявка на вывод средств")
 		await ctx.telegram.sendMessage(310105867,"Все работать хорошо, тебе приходить рассылка постоянно")
 		await ctx.replyWithHTML(
 			`Ваша заявка на вывод процентов оформлена, 
-				<strong>Ожидайте вывод в течении 24 часов </strong>`
+				<strong>Ожидайте вывод в течение 24 часов </strong>`
 		)
 	}
 	return ctx.scene.leave()

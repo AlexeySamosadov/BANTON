@@ -1,6 +1,6 @@
 const { Markup, Composer, Scenes } = require('telegraf')
 const KeyBoards = require('../buttons/buttons')
-const Clients = require('./../models/clients.js')
+const Clients = require('../models/clients.js')
 
 const startStep = new Composer()
 startStep.on('text', async (ctx) => {

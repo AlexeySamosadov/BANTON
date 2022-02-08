@@ -7,16 +7,15 @@ const startStep = new Composer()
 startStep.on('text', async (ctx) => {
 	try {
 		const messengerName = String(ctx.update?.message?.from?.first_name)
-		console.log('------->messengerName<---------', messengerName);
 		const Keyboard = Markup.keyboard([
 			['Пополнить баланс', 'Вывод средств'],
-			['Баланс', 'Потдержка'],
+			['Баланс', 'Поддержка'],
 		])
 			.oneTime()
 			.resize()
 		
 		await ctx.replyWithHTML(
-			  `${messengerName} для получения помощи напишите <a href="https://t.me/AlexeySamosadov">сюда</a> `, 
+			  `<b>${messengerName}</b>, для получения помощи напишите <a href="https://t.me/AlexeySamosadov">сюда</a> `, 
 			  Keyboard
 		)
 

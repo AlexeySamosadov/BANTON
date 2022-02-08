@@ -18,12 +18,13 @@ class KeyBoards {
     static async startRegiseredUserButtons(ctx) {
         const keyboard = Keyboard.make([
             ['Пополнить баланс', 'Вывод средств'], // First row
-            ['Баланс', 'Потдержка'], // Second row
+            ['Баланс', 'Поддержка'],
+            ['Пригласи друга'] // Second row
           ])
 
 
         return await ctx.replyWithHTML(
-            `<b><i>${ctx.from.first_name}</i></b>, Здраствуйте!` +
+            `<b><i>${ctx.from.first_name}</i></b>, здраствуйте!` +
              '\n Добро пожаловать в <b>TONBANK</b>: \n Выберете пункты меню:',
              keyboard.reply())
         //     Markup.keyboard([
@@ -39,7 +40,7 @@ class KeyBoards {
         return  
             Markup.keyboard([
                 ['Пополнить баланс', 'Вывод средств'],
-                ['Баланс', 'Потдержка'],
+                ['Баланс', 'Поддержка'],
             ])
                 .oneTime()
                 .resize()
@@ -61,8 +62,8 @@ class KeyBoards {
     }
 
     static async confirmBalanceButton(ctx) {
-        return await ctx.reply(
-            `${ctx.from.first_name} После перевода TON, нажмите кнопку "Подтвердить зачисление" для зачисления на ваш счет`,
+        return await ctx.replyWithHTML(
+            `<b>${ctx.from.first_name}</b>, после перевода TON, нажмите кнопку "Подтвердить зачисление"`,
             Markup.keyboard([
                 ['Подтвердить зачисление'],
             ])

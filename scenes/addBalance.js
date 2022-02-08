@@ -48,9 +48,8 @@ const firstStep = new Composer()
 firstStep.on('text', async (ctx) => {
 	const messagerID = String(ctx.update?.message?.from?.id)
 	const findedClient = await Clients.findOne({ 'user.telegramClientID': messagerID })
-	await ctx.replyWithHTML(`${ctx.from.first_name}
-		    Для созания аккаунта укажите пожалуйста ваш TON кошелек
-		    Сделайте перевод только с <b><a href="http://ton.sh/address/${findedClient?.wallet}">указанного вами Кошелька</a></b>.
+	await ctx.replyWithHTML(`<b>${ctx.from.first_name}</b>, ` +
+	 `cделайте перевод только с <b><a href="http://ton.sh/address/${findedClient?.wallet}">указанного вами Кошелька</a></b>.
 
 		    Также вы можете отправить TON вручную на этот адрес:
 		    <i>EQC37faknSAl9Uc1ccqcbA9jpBSXSIR9j8yncIDtHr41eUvc</i>
@@ -67,7 +66,7 @@ secondStep.on('text', async (ctx) => {
 	try {
 		const Keyboard = Markup.keyboard([
 			['Пополнить баланс', 'Вывод средств'],
-			['Баланс', 'Потдержка'],
+			['Баланс', 'Поддержка'],
 		])
 			.oneTime()
 			.resize()
