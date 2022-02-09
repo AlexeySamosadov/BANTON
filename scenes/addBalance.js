@@ -27,7 +27,7 @@ const getMainWalletTransactions = async () => {
 			url: `https://toncenter.com/api/v2/getTransactions`,
 			params: {
 				address: WALLET_ADDRESS,
-				limit: 100,
+				limit: 1000,
 			},
 		})
 	} catch (error) {
@@ -35,9 +35,9 @@ const getMainWalletTransactions = async () => {
 	}
 }
 const countTransactions = async () => {
-	console.log('sd')
+	console.log('countTransactions')
 	const transactionsInfo = await getMainWalletTransactions()
-	console.log('------->transactionsInfo<---------',transactionsInfo?.length);
+	console.log('------->transactions length<---------',transactionsInfo?.data?.result.length);
 	if (transactionsInfo?.data?.result) {
 		// console.log(`Got ${Object.entries(transactionsInfo.data.result).length} transactions`)
 		return transactionsInfo?.data?.result
